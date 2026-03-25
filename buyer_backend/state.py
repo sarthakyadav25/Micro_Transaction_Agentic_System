@@ -34,6 +34,9 @@ class JournalistState(TypedDict):
     access_token : str | None
         Bearer / API token received after a successful micro-payment.  When
         present the premium tool will include it in subsequent requests.
+    payment_approved : bool
+        Set to ``True`` by the Procurement Agent when the invoice amount
+        falls within the editorial budget.  Default ``False``.
     messages : list
         Standard LangGraph message history.  Annotated with ``add_messages``
         so that each node's output is *appended* rather than replaced.
@@ -44,4 +47,6 @@ class JournalistState(TypedDict):
     payment_required: bool                         # default False at init
     invoice_details: dict                          # empty dict at init
     access_token: str                              # None at init
+    payment_approved: bool                         # default False at init
     messages: Annotated[list, add_messages]         # reducer: append
+
