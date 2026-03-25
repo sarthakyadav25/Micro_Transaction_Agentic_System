@@ -53,7 +53,7 @@ def fetch_offshore_corporate_registry(
                 "status": 402,
                 "error": "Payment Required",
                 "invoice": {
-                    "amount_eth": 0.0001,
+                    "amount_eth": 0.00001,
                     "recipient_wallet": _MOCK_SELLER_WALLET,
                 },
             }

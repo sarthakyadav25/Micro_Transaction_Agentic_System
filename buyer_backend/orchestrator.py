@@ -72,7 +72,7 @@ def _get_llm():
 # ---------------------------------------------------------------------------
 # Helper: execute tool calls returned by the model
 # ---------------------------------------------------------------------------
-def _execute_tool_calls(ai_message: AIMessage) -> list[ToolMessage]:
+def _execute_tool_calls(ai_message: AIMessage, access_token: str) -> list[ToolMessage]:
     """Run every tool call present in an AIMessage and return ToolMessages."""
     tool_messages: list[ToolMessage] = []
 
@@ -91,6 +91,9 @@ def _execute_tool_calls(ai_message: AIMessage) -> list[ToolMessage]:
         # Inject the current access_token into the tool kwargs if the tool
         # accepts it and the LLM didn't already provide one.
         kwargs = dict(call["args"])
+        if access_token and "access_token" not in kwargs:
+            kwargs["access_token"] = access_token
+            
         result = tool_fn.invoke(kwargs)
 
         tool_messages.append(
@@ -156,7 +159,7 @@ def orchestrator_node(state: JournalistState) -> dict:
     draft_content = state.get("draft_content", "")
 
     if ai_response.tool_calls:
-        tool_msgs = _execute_tool_calls(ai_response)
+        tool_msgs = _execute_tool_calls(ai_response, state.get("access_token", ""))
         new_messages.extend(tool_msgs)
 
         # --- 3a. Check for 402 in tool results ---------------------------
