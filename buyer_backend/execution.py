@@ -92,48 +92,47 @@ def execution_node(state: JournalistState) -> dict:
     # =====================================================================
     try:
         # ==============================================================
-        # REAL Web3 LOGIC (uncomment for live testnet transactions)
+        # REAL Web3 LOGIC
         # ==============================================================
-        # from web3 import Web3
-        #
-        # w3 = Web3(Web3.HTTPProvider(provider_uri))
-        # if not w3.is_connected():
-        #     raise ConnectionError(
-        #         f"Could not connect to Web3 provider: {provider_uri}"
-        #     )
-        #
-        # account = w3.eth.account.from_key(private_key)
-        # sender_address = account.address
-        #
-        # # Build the transaction
-        # tx = {
-        #     "to": Web3.to_checksum_address(recipient_wallet),
-        #     "value": w3.to_wei(amount_eth, "ether"),
-        #     "gas": 21_000,
-        #     "gasPrice": w3.eth.gas_price,
-        #     "nonce": w3.eth.get_transaction_count(sender_address),
-        #     "chainId": w3.eth.chain_id,
-        # }
-        #
-        # # Sign & send
-        # signed_tx = w3.eth.account.sign_transaction(tx, private_key)
-        # raw_tx_hash = w3.eth.send_raw_transaction(
-        #     signed_tx.raw_transaction
-        # )
-        # tx_hash = raw_tx_hash.hex()
+        from web3 import Web3
+
+        w3 = Web3(Web3.HTTPProvider(provider_uri))
+        if not w3.is_connected():
+            raise ConnectionError(
+                f"Could not connect to Web3 provider: {provider_uri}"
+            )
+
+        account = w3.eth.account.from_key(private_key)
+        sender_address = account.address
+
+        # Build the transaction
+        tx = {
+            "to": Web3.to_checksum_address(recipient_wallet),
+            "value": w3.to_wei(amount_eth, "ether"),
+            "gas": 21_000,
+            "gasPrice": w3.eth.gas_price,
+            "nonce": w3.eth.get_transaction_count(sender_address),
+            "chainId": w3.eth.chain_id,
+        }
+
+        # Sign & send
+        signed_tx = w3.eth.account.sign_transaction(tx, private_key)
+        raw_tx_hash = w3.eth.send_raw_transaction(
+            signed_tx.raw_transaction
+        )
+        tx_hash = raw_tx_hash.hex()
 
         # ==============================================================
         # MOCK transaction (saves RPC limits during hackathon)
-        # Simulates a 2-second network delay and returns a fake tx hash.
         # ==============================================================
-        time.sleep(2)
-        tx_hash = (
-            "0x"
-            "a1b2c3d4e5f67890"
-            "a1b2c3d4e5f67890"
-            "a1b2c3d4e5f67890"
-            "a1b2c3d4e5f67890"
-        )
+        # time.sleep(2)
+        # tx_hash = (
+        #     "0x"
+        #     "a1b2c3d4e5f67890"
+        #     "a1b2c3d4e5f67890"
+        #     "a1b2c3d4e5f67890"
+        #     "a1b2c3d4e5f67890"
+        # )
 
         # ==============================================================
         # State update — tx hash is the x402 proof-of-payment
