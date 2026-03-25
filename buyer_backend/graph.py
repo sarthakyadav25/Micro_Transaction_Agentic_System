@@ -17,22 +17,6 @@ from audit import audit_node
 
 
 # ---------------------------------------------------------------------------
-# Setup the Tool Node for the graph
-# ---------------------------------------------------------------------------
-tool_execution_node = ToolNode(TOOLS)
-
-
-# ---------------------------------------------------------------------------
-# Conditional Router: After the Graph runs tools, check if a 402 was hit
-# ---------------------------------------------------------------------------
-def route_after_tool(state: JournalistState) -> str:
-    """Route to Procurement if 402 hit, else return to Orchestrator."""
-    if state.get("payment_required"):
-        return "procurement_node"
-    return "orchestrator_node"
-
-
-# ---------------------------------------------------------------------------
 # Conditional Router: After Procurement validation
 # ---------------------------------------------------------------------------
 def route_after_procurement(state: JournalistState) -> str:
@@ -49,7 +33,6 @@ workflow = StateGraph(JournalistState)
 
 # 1. Add Nodes
 workflow.add_node("orchestrator_node", orchestrator_node)
-workflow.add_node("tool_execution_node", tool_execution_node)
 workflow.add_node("procurement_node", procurement_node)
 workflow.add_node("execution_node", execution_node)
 workflow.add_node("audit_node", audit_node)
@@ -57,17 +40,10 @@ workflow.add_node("audit_node", audit_node)
 # 2. Define Edges (The Control Flow)
 workflow.add_edge(START, "orchestrator_node")
 
-# From orchestrator: If tool calls exist, run them. If finished, go to audit.
+# From orchestrator: Since it executes tools internally, route based on 402 hit
 workflow.add_conditional_edges(
     "orchestrator_node",
-    # Helper lambda to check if the last message has tool calls
-    lambda state: "tool_execution_node" if hasattr(state["messages"][-1], "tool_calls") and state["messages"][-1].tool_calls else "audit_node"
-)
-
-# From tools: Check state for 402 flag
-workflow.add_conditional_edges(
-    "tool_execution_node",
-    route_after_tool
+    lambda state: "procurement_node" if state.get("payment_required") else "audit_node"
 )
 
 # From procurement: Route based on budget approval

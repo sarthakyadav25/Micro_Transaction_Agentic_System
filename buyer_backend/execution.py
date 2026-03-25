@@ -84,7 +84,7 @@ def execution_node(state: JournalistState) -> dict:
     # =====================================================================
     # Web3 Setup
     # =====================================================================
-    provider_uri = os.getenv("WEB3_PROVIDER_URI", "")
+    provider_uri = os.getenv("WEB3_PROVIDER_URI", os.getenv("WEB3_PROVIDER_URL", ""))
     private_key = os.getenv("SENDER_PRIVATE_KEY", "")
 
     # =====================================================================
@@ -154,5 +154,6 @@ def execution_node(state: JournalistState) -> dict:
             f"Execution Agent: Payment FAILED — {type(exc).__name__}: {exc}"
         )
         return {
+            "payment_required": False,  # Abort retry loop on failure
             "messages": [AIMessage(content=error_msg)],
         }

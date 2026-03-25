@@ -18,7 +18,7 @@ from langchain_core.tools import tool
 # ---------------------------------------------------------------------------
 # Mock seller wallet address (would be read from x402 challenge in production)
 # ---------------------------------------------------------------------------
-_MOCK_SELLER_WALLET = "0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97"
+_MOCK_SELLER_WALLET = "0x03BFf3Bc2Cf723b0Bb62bce7288B8D3940De9025"
 
 
 @tool

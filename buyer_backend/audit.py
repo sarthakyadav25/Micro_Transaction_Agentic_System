@@ -94,5 +94,6 @@ def audit_node(state: JournalistState) -> dict:
     with open("compliance_audit_log.md", "a", encoding="utf-8") as f:
         f.write(report_str)
 
-    # We don't actually need to update the state, so return empty dict
-    return {}
+    # We must return a dict with a valid key for the reducer, otherwise
+    # LangGraph outputs an empty/None state update which breaks iterators.
+    return {"messages": []}
