@@ -4,11 +4,11 @@ tools.py — Premium Data Tools for the AI Investigative Journalist.
 Contains `fetch_offshore_corporate_registry`, a LangChain tool that simulates
 calling a paywalled corporate-data API.
 
-**402 Protocol**
+**402 Protocol (x402 / Ethereum)**
 When the caller does not supply a valid `access_token`, the tool returns a
-structured 402 error (JSON) instead of raising an exception.  This lets the
-orchestrator detect the paywall, set `payment_required = True` in the graph
-state, and hand off to downstream Procurement / Execution agents.
+structured 402 error (JSON) containing an Ethereum invoice with `amount_eth`
+and `recipient_wallet`.  After the Execution Agent sends the on-chain payment,
+the resulting transaction hash is used as the `access_token` (proof-of-payment).
 """
 
 import json
@@ -16,10 +16,9 @@ from langchain_core.tools import tool
 
 
 # ---------------------------------------------------------------------------
-# The single valid token accepted by our mock endpoint.
-# In production this would be verified against the x402 payment receipt.
+# Mock seller wallet address (would be read from x402 challenge in production)
 # ---------------------------------------------------------------------------
-_VALID_ACCESS_TOKEN = "x402_paid_token_abc123"
+_MOCK_SELLER_WALLET = "0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97"
 
 
 @tool
@@ -34,8 +33,9 @@ def fetch_offshore_corporate_registry(
     query : str
         A natural-language search query (e.g. a company name or jurisdiction).
     access_token : str, optional
-        The bearer token obtained after completing an x402 micro-payment.
-        If missing or invalid the endpoint returns HTTP 402.
+        Proof-of-payment token.  In the x402 Ethereum flow this is the
+        transaction hash (starts with ``0x``).  If missing or invalid the
+        endpoint returns HTTP 402 with an Ethereum invoice.
 
     Returns
     -------
@@ -44,23 +44,23 @@ def fetch_offshore_corporate_registry(
         error envelope containing the invoice / payment instructions.
     """
     # ------------------------------------------------------------------
-    # Guard: no token or wrong token  →  simulate 402 Payment Required
+    # Guard: no token or token doesn't look like a tx hash
+    #   → simulate 402 Payment Required with Ethereum invoice
     # ------------------------------------------------------------------
-    if not access_token or access_token != _VALID_ACCESS_TOKEN:
+    if not access_token or not access_token.startswith("0x"):
         return json.dumps(
             {
                 "status": 402,
                 "error": "Payment Required",
                 "invoice": {
-                    "amount": 1.50,
-                    "currency": "USD",
-                    "node_id": "mock_lightning_node_abc123",
+                    "amount_eth": 0.0001,
+                    "recipient_wallet": _MOCK_SELLER_WALLET,
                 },
             }
         )
 
     # ------------------------------------------------------------------
-    # Happy path: token is valid  →  return mock premium data
+    # Happy path: valid tx-hash-style token  →  return premium data
     # ------------------------------------------------------------------
     return json.dumps(
         {
