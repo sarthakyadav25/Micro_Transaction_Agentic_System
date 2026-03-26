@@ -1,0 +1,22 @@
+{
+  "id": "tech-giant-ai",
+  "title": "Tech Giants Pour Billions into Generative AI Infrastructure",
+  "author": "Tech Desk",
+  "timestamp": "2 Hours Ago",
+  "category": "Tech",
+  "image": "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1200&auto=format&fit=crop",
+  "content": [
+    "New Delhi: The race for artificial intelligence supremacy is intensifying, with major technology companies drastically increasing their capital expenditures. According to recent reports, billions of dollars are being funneled into building robust infra to support generative AI models.",
+    "This surge in spending is primarily directed towards securing advanced semiconductors and expanding data center capabilities. Industry analysts suggest that this infrastructure build-out is foundational for the next generation of cloud services.",
+    "However, questions remain about the immediate return on investment. While some companies have started monetizing their AI offerings through enterprise subscriptions, the massive upfront costs have made some investors cautious.",
+    "Despite these concerns, executives at leading firms maintain that this is a once-in-a-generation platform shift. They argue that under-investing now poses a significantly greater risk than over-investing."
+  ],
+  "tags": [
+    "Artificial Intelligence",
+    "Cloud Computing",
+    "Semiconductors",
+    "Investments"
+  ],
+  "isFree": false,
+  "traffic": 54138
+}

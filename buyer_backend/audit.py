@@ -34,7 +34,8 @@ def audit_node(state: JournalistState) -> dict:
     # ----- 1. Extract state variables ------------------------------------
     topic = state.get("topic", "Unknown Topic")
     invoice = state.get("invoice_details", {})
-    amount = invoice.get("amount_eth", 0.0)
+    amount = invoice.get("amount", 0.0)
+    currency = invoice.get("currency", "USDC")
     wallet = invoice.get("recipient_wallet", "N/A")
     approved = state.get("payment_approved", False)
     tx_hash = state.get("access_token", "None")
@@ -62,7 +63,7 @@ def audit_node(state: JournalistState) -> dict:
         "### 📊 Financial Summary",
         "| Metric | Value |",
         "| :--- | :--- |",
-        f"| **Requested Amount** | {amount} ETH |",
+        f"| **Requested Amount** | {amount} {currency} |",
         f"| **Recipient Wallet** | `{wallet}` |",
         f"| **Budget Check** | {status_emoji} |",
         f"| **Justification** | {reason} |",

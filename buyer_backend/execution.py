@@ -3,7 +3,7 @@ execution.py — Execution Agent Node for the Investigative Journalist Graph.
 
 After the Procurement Agent approves the budget, this node:
 
-1. Reads the Ethereum invoice (``amount_eth``, ``recipient_wallet``) from
+1. Reads the Ethereum invoice (``amount``, ``recipient_wallet``) from
    the graph state.
 2. Sends an on-chain micro-payment using ``web3.py``.
 3. Stores the resulting transaction hash as the ``access_token`` (x402
@@ -38,7 +38,7 @@ def execution_node(state: JournalistState) -> dict:
     ----------
     state : JournalistState
         Must contain ``payment_approved == True`` and a populated
-        ``invoice_details`` with ``amount_eth`` and ``recipient_wallet``.
+        ``invoice_details`` with ``amount`` and ``recipient_wallet``.
 
     Returns
     -------
@@ -66,15 +66,16 @@ def execution_node(state: JournalistState) -> dict:
     # Extract invoice details
     # =====================================================================
     invoice = state.get("invoice_details", {})
-    amount_eth = invoice.get("amount_eth", 0)
+    amount = invoice.get("amount", 0)
     recipient_wallet = invoice.get("recipient_wallet", "")
+    asset_address = invoice.get("asset", "")
 
-    if not recipient_wallet:
+    if not recipient_wallet or not asset_address:
         return {
             "messages": [
                 AIMessage(
                     content=(
-                        "Execution Agent: No recipient wallet found in "
+                        "Execution Agent: Missing recipient wallet or asset address in "
                         "invoice_details. Cannot execute payment."
                     )
                 )
@@ -88,12 +89,9 @@ def execution_node(state: JournalistState) -> dict:
     private_key = os.getenv("SENDER_PRIVATE_KEY", "")
 
     # =====================================================================
-    # Transaction Logic
+    # Transaction Logic - ERC-20 USDC Transfer on Base Sepolia
     # =====================================================================
     try:
-        # ==============================================================
-        # REAL Web3 LOGIC
-        # ==============================================================
         from web3 import Web3
 
         w3 = Web3(Web3.HTTPProvider(provider_uri))
@@ -105,15 +103,36 @@ def execution_node(state: JournalistState) -> dict:
         account = w3.eth.account.from_key(private_key)
         sender_address = account.address
 
-        # Build the transaction
-        tx = {
-            "to": Web3.to_checksum_address(recipient_wallet),
-            "value": w3.to_wei(amount_eth, "ether"),
-            "gas": 21_000,
-            "gasPrice": w3.eth.gas_price,
+        # Minimal ERC-20 ABI for transfer
+        erc20_abi = [
+            {
+                "constant": False,
+                "inputs": [
+                    {"name": "_to", "type": "address"},
+                    {"name": "_value", "type": "uint256"}
+                ],
+                "name": "transfer",
+                "outputs": [{"name": "", "type": "bool"}],
+                "type": "function"
+            }
+        ]
+
+        # Convert amount back to base units (USDC uses 6 decimals)
+        amount_base_units = int(amount * 1_000_000)
+
+        asset_address_checksum = Web3.to_checksum_address(asset_address)
+        recipient_checksum = Web3.to_checksum_address(recipient_wallet)
+
+        contract = w3.eth.contract(address=asset_address_checksum, abi=erc20_abi)
+
+        # Build the ERC-20 transfer transaction
+        tx = contract.functions.transfer(recipient_checksum, amount_base_units).build_transaction({
+            "from": sender_address,
             "nonce": w3.eth.get_transaction_count(sender_address),
+            "gas": 100_000,
+            "gasPrice": w3.eth.gas_price,
             "chainId": w3.eth.chain_id,
-        }
+        })
 
         # Sign & send
         signed_tx = w3.eth.account.sign_transaction(tx, private_key)
@@ -122,23 +141,14 @@ def execution_node(state: JournalistState) -> dict:
         )
         tx_hash = raw_tx_hash.hex()
 
-        # ==============================================================
-        # MOCK transaction (saves RPC limits during hackathon)
-        # ==============================================================
-        # time.sleep(2)
-        # tx_hash = (
-        #     "0x"
-        #     "a1b2c3d4e5f67890"
-        #     "a1b2c3d4e5f67890"
-        #     "a1b2c3d4e5f67890"
-        #     "a1b2c3d4e5f67890"
-        # )
+        # Optional: Wait for receipt in production, but returning hash immediately is faster
+        # w3.eth.wait_for_transaction_receipt(raw_tx_hash)
 
         # ==============================================================
         # State update — tx hash is the x402 proof-of-payment
         # ==============================================================
         audit_msg = (
-            f"Execution Agent: Successfully sent {amount_eth} ETH to "
+            f"Execution Agent: Successfully sent {amount} USDC to "
             f"{recipient_wallet}. Tx hash: {tx_hash}"
         )
 

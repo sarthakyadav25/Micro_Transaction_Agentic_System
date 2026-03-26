@@ -2,6 +2,7 @@
 venv/
 .venv/
 env/
+node_modules/
 
 # Environment variables
 .env

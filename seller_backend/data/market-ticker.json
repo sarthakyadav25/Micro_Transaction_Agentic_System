@@ -1,0 +1,10 @@
+[
+  { "symbol": "SENSEX", "value": "73,456.78", "change": "+450.23", "percent": "0.62%", "isUp": true },
+  { "symbol": "NIFTY 50", "value": "22,345.10", "change": "+120.45", "percent": "0.54%", "isUp": true },
+  { "symbol": "NIFTY BANK", "value": "47,890.30", "change": "-50.15", "percent": "0.10%", "isUp": false },
+  { "symbol": "GOLD", "value": "62,340.00", "change": "+150.00", "percent": "0.24%", "isUp": true },
+  { "symbol": "USD/INR", "value": "83.12", "change": "-0.05", "percent": "0.06%", "isUp": false },
+  { "symbol": "RELIANCE", "value": "2,950.40", "change": "+34.50", "percent": "1.18%", "isUp": true },
+  { "symbol": "TCS", "value": "4,120.60", "change": "-12.30", "percent": "0.30%", "isUp": false },
+  { "symbol": "HDFCBANK", "value": "1,450.75", "change": "+15.20", "percent": "1.06%", "isUp": true }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "tech-giant-ai",
+    "title": "Tech Giants Pour Billions into Generative AI Infrastructure",
+    "summary": "Major tech companies are increasing capital expenditures to secure dominance in the AI race, driving demand for advanced chips.",
+    "category": "Tech",
+    "timestamp": "2 Hours Ago",
+    "image": "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    "id": "market-rallies",
+    "title": "Sensex Hits Lifetime Highs Amid Global Market Rally",
+    "summary": "The Indian equity market benchmarks climbed to fresh all-time highs following positive global cues and domestic institutional buying.",
+    "category": "Markets",
+    "timestamp": "4 Hours Ago",
+    "image": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    "id": "budget-2026",
+    "title": "Budget 2026: Expectations High for Personal Tax Relief",
+    "summary": "Middle-class taxpayers are holding out hope for significant relief in standard deduction limits in the upcoming Union Budget.",
+    "category": "Economy",
+    "timestamp": "6 Hours Ago",
+    "image": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    "id": "startup-funding",
+    "title": "Indian Startups See Revival in Late-Stage Funding",
+    "summary": "After a prolonged funding winter, multiple late-stage Indian startups have successfully raised growth capital over the past month.",
+    "category": "Startups",
+    "timestamp": "8 Hours Ago",
+    "image": "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?q=80&w=600&auto=format&fit=crop"
+  }
+]

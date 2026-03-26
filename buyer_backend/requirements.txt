@@ -5,3 +5,4 @@ langchain-openai
 requests
 python-dotenv
 web3
+requests
