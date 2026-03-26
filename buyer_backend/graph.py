@@ -7,7 +7,6 @@ pause, route to Procurement/Execution, and loop back with the new token.
 """
 
 from langgraph.graph import StateGraph, START, END
-from langgraph.prebuilt import ToolNode
 
 from state import JournalistState
 from orchestrator import orchestrator_node, TOOLS
@@ -40,10 +39,19 @@ workflow.add_node("audit_node", audit_node)
 # 2. Define Edges (The Control Flow)
 workflow.add_edge(START, "orchestrator_node")
 
-# From orchestrator: Since it executes tools internally, route based on 402 hit
+# Maximum number of payment retry cycles before aborting
+MAX_PAYMENT_RETRIES = 1
+
+# From orchestrator: Route to procurement on 402 (if retries remain), else audit
+def route_after_orchestrator(state: JournalistState) -> str:
+    """Route to Procurement if a 402 was hit and retries remain, else Audit."""
+    if state.get("payment_required") and state.get("payment_attempts", 0) <= MAX_PAYMENT_RETRIES:
+        return "procurement_node"
+    return "audit_node"
+
 workflow.add_conditional_edges(
     "orchestrator_node",
-    lambda state: "procurement_node" if state.get("payment_required") else "audit_node"
+    route_after_orchestrator
 )
 
 # From procurement: Route based on budget approval

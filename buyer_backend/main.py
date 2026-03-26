@@ -25,6 +25,7 @@ def main():
         invoice_details={},
         access_token=None,
         payment_approved=False,
+        payment_attempts=0,
         messages=[]
     )
     

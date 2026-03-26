@@ -37,6 +37,9 @@ class JournalistState(TypedDict):
     payment_approved : bool
         Set to ``True`` by the Procurement Agent when the invoice amount
         falls within the editorial budget.  Default ``False``.
+    payment_attempts : int
+        Tracks the number of payment cycles attempted.  Used to prevent
+        infinite loops when execution keeps failing.  Default ``0``.
     messages : list
         Standard LangGraph message history.  Annotated with ``add_messages``
         so that each node's output is *appended* rather than replaced.
@@ -48,5 +51,6 @@ class JournalistState(TypedDict):
     invoice_details: dict                          # empty dict at init
     access_token: str                              # None at init
     payment_approved: bool                         # default False at init
+    payment_attempts: int                          # default 0 at init
     messages: Annotated[list, add_messages]         # reducer: append
 

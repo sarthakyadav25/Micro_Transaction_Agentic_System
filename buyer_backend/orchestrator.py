@@ -157,6 +157,7 @@ def orchestrator_node(state: JournalistState) -> dict:
     payment_required = state.get("payment_required", False)
     invoice_details = state.get("invoice_details", {})
     draft_content = state.get("draft_content", "")
+    payment_attempts = state.get("payment_attempts", 0)
 
     if ai_response.tool_calls:
         tool_msgs = _execute_tool_calls(ai_response, state.get("access_token", ""))
@@ -167,6 +168,7 @@ def orchestrator_node(state: JournalistState) -> dict:
         if invoice:
             payment_required = True
             invoice_details = invoice
+            payment_attempts += 1
         else:
             # Tools succeeded — ask the model to produce the final draft
             # with the data it just received.
@@ -184,4 +186,5 @@ def orchestrator_node(state: JournalistState) -> dict:
         "draft_content": draft_content,
         "payment_required": payment_required,
         "invoice_details": invoice_details,
+        "payment_attempts": payment_attempts,
     }
