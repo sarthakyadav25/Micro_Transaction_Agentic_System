@@ -15,7 +15,7 @@ function App() {
             <div className="w-8 h-8 rounded bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
               <Newspaper className="w-4 h-4 text-white" />
             </div>
-            <h1 className="font-bold text-lg tracking-tight text-white">X402 Desk</h1>
+            <h1 className="font-bold text-lg tracking-tight text-white">AI Investigative Journalist</h1>
           </div>
           <p className="text-xs text-gray-400 mt-2 font-medium">Agentic Procurement</p>
         </div>

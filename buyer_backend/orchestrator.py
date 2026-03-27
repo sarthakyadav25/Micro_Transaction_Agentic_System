@@ -93,10 +93,10 @@ def _execute_tool_calls(ai_message: AIMessage, access_token: str) -> list[ToolMe
             )
             continue
 
-        # Inject the current access_token into the tool kwargs if the tool
-        # accepts it and the LLM didn't already provide one.
+        # Inject the current access_token into the tool kwargs ONLY for fetch_article,
+        # ensuring we don't crash discover_articles with unexpected kwargs.
         kwargs = dict(call["args"])
-        if access_token and "access_token" not in kwargs:
+        if access_token and "access_token" not in kwargs and call["name"] == "fetch_article":
             kwargs["access_token"] = access_token
             
         result = tool_fn.invoke(kwargs)
@@ -152,40 +152,40 @@ def orchestrator_node(state: JournalistState) -> dict:
     else:
         messages.extend(state["messages"])
 
-    # ----- 2. Call the LLM ------------------------------------------------
-    ai_response: AIMessage = _get_llm().invoke(messages)
-
-    # Collect new messages to append to state
-    new_messages: list = [ai_response]
-
-    # ----- 3. If the model requested tool calls, execute them -------------
+    # ----- 2. Autonomously execute the Agentic Loop -----------------------
     payment_required = state.get("payment_required", False)
     invoice_details = state.get("invoice_details", {})
     draft_content = state.get("draft_content", "")
     payment_attempts = state.get("payment_attempts", 0)
 
-    if ai_response.tool_calls:
-        tool_msgs = _execute_tool_calls(ai_response, state.get("access_token", ""))
-        new_messages.extend(tool_msgs)
+    new_messages: list = []
 
-        # --- 3a. Check for 402 in tool results ---------------------------
-        invoice = _detect_402(tool_msgs)
-        if invoice:
-            payment_required = True
-            invoice_details = invoice
-            payment_attempts += 1
+    while True:
+        # Call the LLM with full context
+        ai_response: AIMessage = _get_llm().invoke(messages + new_messages)
+        new_messages.append(ai_response)
+
+        if ai_response.tool_calls:
+            # Execute requested tools
+            tool_msgs = _execute_tool_calls(ai_response, state.get("access_token", ""))
+            new_messages.extend(tool_msgs)
+
+            # Check for a 402 Payment Required response from premium tools
+            invoice = _detect_402(tool_msgs)
+            if invoice:
+                payment_required = True
+                invoice_details = invoice
+                payment_attempts += 1
+                break  # Exit loop to route conditionally to Procurement Agent
+            
+            # If no 402, tools succeeded. The loop continues so the LLM
+            # can either make another tool call or write the final draft.
         else:
-            # Tools succeeded — ask the model to produce the final draft
-            # with the data it just received.
-            follow_up: AIMessage = _get_llm().invoke(messages + new_messages)
-            new_messages.append(follow_up)
-            draft_content = follow_up.content
-    else:
-        # No tool calls — the model replied directly (shouldn't normally
-        # happen given the system prompt, but handle gracefully).
-        draft_content = ai_response.content
+            # No tool calls — the model has successfully written the article
+            draft_content = ai_response.content
+            break
 
-    # ----- 4. Return partial state update ---------------------------------
+    # ----- 3. Return partial state update ---------------------------------
     return {
         "messages": new_messages,
         "draft_content": draft_content,

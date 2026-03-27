@@ -64,17 +64,23 @@ export default function ChatInterface() {
                 // Track unique steps gracefully
                 setAgentSteps(prev => {
                   const newSteps = [...prev];
-                  const existingStepIndex = newSteps.findIndex(s => s.node === data.node);
                   
+                  // If we already have execution_node and get orchestrator_node again, rename node to "writing"
+                  const hasExecution = newSteps.some(s => s.node === 'execution_node');
+                  const nodeName = (data.node === 'orchestrator_node' && hasExecution) ? 'writing' : data.node;
+                  const message = (nodeName === 'writing') ? 'Drafting the final investigative briefing...' : data.message;
+                  
+                  const targetIndex = newSteps.findIndex(s => s.node === nodeName);
+
                   const stepObj = {
-                    node: data.node,
-                    message: data.message,
+                    node: nodeName,
+                    message: message,
                     payment_required: data.payment_required,
                     invoice: data.invoice_details
                   };
 
-                  if (existingStepIndex >= 0) {
-                    newSteps[existingStepIndex] = stepObj;
+                  if (targetIndex >= 0) {
+                    newSteps[targetIndex] = stepObj;
                   } else {
                     newSteps.push(stepObj);
                   }
@@ -96,9 +102,13 @@ export default function ChatInterface() {
     }
   };
 
-  const getStepIcon = (nodeName) => {
+  const getStepIcon = (nodeName, isCurrentStep) => {
+    if (!isCurrentStep && nodeName !== 'audit_node') {
+      return <CheckCircle2 className="w-4 h-4 text-gray-500" />;
+    }
     switch(nodeName) {
       case 'orchestrator_node': return <Loader2 className="w-4 h-4 animate-spin text-blue-400" />;
+      case 'writing': return <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />;
       case 'procurement_node': return <ShieldAlert className="w-4 h-4 text-orange-400" />;
       case 'execution_node': return <Link2 className="w-4 h-4 text-purple-400" />;
       case 'audit_node': return <CheckCircle2 className="w-4 h-4 text-green-400" />;
@@ -108,6 +118,7 @@ export default function ChatInterface() {
 
   const formatNodeName = (name) => {
     if (name === 'start') return 'Initializing';
+    if (name === 'writing') return 'Writing the article...';
     return name.replace('_node', '').charAt(0).toUpperCase() + name.replace('_node', '').slice(1);
   };
 
@@ -160,8 +171,8 @@ export default function ChatInterface() {
                 {agentSteps.map((step, idx) => (
                   <div key={idx} className="flex gap-4">
                     <div className="relative flex flex-col items-center">
-                      <div className="w-8 h-8 rounded-full bg-[#222] border border-[#333] flex items-center justify-center shrink-0 z-10">
-                        {getStepIcon(step.node)}
+                      <div className="w-8 h-8 rounded-full bg-[#222] border border-[#333] flex items-center justify-center shrink-0 z-10 transition-colors duration-500">
+                        {getStepIcon(step.node, idx === agentSteps.length - 1 && isInvestigating)}
                       </div>
                       {idx !== agentSteps.length - 1 && (
                         <div className="w-px h-full bg-[#333] absolute top-8 bottom-0 -mb-4"></div>
