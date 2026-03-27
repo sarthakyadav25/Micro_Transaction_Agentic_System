@@ -163,3 +163,123 @@
 - **Audit Agent** → Log recorded
 
 ---
+## 📋 Seller Audit Log Entry
+**Timestamp:** 2026-03-27T11:12:52.696Z
+**Article:** Sensex Hits Lifetime Highs Amid Global Market Rally (`market-rallies`)
+
+### 💰 Transaction Summary
+| Metric | Value |
+| :--- | :--- |
+| **Broker Price** | $0.50 USD |
+| **Settlement** | 🟢 Payment Verified — Data Delivered |
+| **Data Delivery** | ✅ Delivered |
+| **Network** | N/A |
+| **Pay-To Wallet** | `N/A` |
+
+### ⏱️ Agent Pipeline
+- **Broker Pricing** → Set price at $0.50
+- **Settlement Agent** → verified
+- **Packager Agent** → ✅ Delivered
+- **Audit Agent** → Log recorded
+
+---
+## 📋 Seller Audit Log Entry
+**Timestamp:** 2026-03-27T11:12:53.046Z
+**Article:** Indian Startups See Revival in Late-Stage Funding (`startup-funding`)
+
+### 💰 Transaction Summary
+| Metric | Value |
+| :--- | :--- |
+| **Broker Price** | $0.50 USD |
+| **Settlement** | 🟢 Payment Verified — Data Delivered |
+| **Data Delivery** | ✅ Delivered |
+| **Network** | N/A |
+| **Pay-To Wallet** | `N/A` |
+
+### ⏱️ Agent Pipeline
+- **Broker Pricing** → Set price at $0.50
+- **Settlement Agent** → verified
+- **Packager Agent** → ✅ Delivered
+- **Audit Agent** → Log recorded
+
+---
+## 📋 Seller Audit Log Entry
+**Timestamp:** 2026-03-27T11:12:53.390Z
+**Article:** Tech Giants Pour Billions into Generative AI Infrastructure (`tech-giant-ai`)
+
+### 💰 Transaction Summary
+| Metric | Value |
+| :--- | :--- |
+| **Broker Price** | $0.50 USD |
+| **Settlement** | 🟢 Payment Verified — Data Delivered |
+| **Data Delivery** | ✅ Delivered |
+| **Network** | N/A |
+| **Pay-To Wallet** | `N/A` |
+
+### ⏱️ Agent Pipeline
+- **Broker Pricing** → Set price at $0.50
+- **Settlement Agent** → verified
+- **Packager Agent** → ✅ Delivered
+- **Audit Agent** → Log recorded
+
+---
+## 📋 Seller Audit Log Entry
+**Timestamp:** 2026-03-27T11:24:20.478Z
+**Article:** Indian Startups See Revival in Late-Stage Funding (`startup-funding`)
+
+### 💰 Transaction Summary
+| Metric | Value |
+| :--- | :--- |
+| **Broker Price** | $0.50 USD |
+| **Settlement** | 🟢 Payment Verified — Data Delivered |
+| **Data Delivery** | ✅ Delivered |
+| **Network** | N/A |
+| **Pay-To Wallet** | `N/A` |
+
+### ⏱️ Agent Pipeline
+- **Broker Pricing** → Set price at $0.50
+- **Settlement Agent** → verified
+- **Packager Agent** → ✅ Delivered
+- **Audit Agent** → Log recorded
+
+---
+## 📋 Seller Audit Log Entry
+**Timestamp:** 2026-03-27T11:24:20.859Z
+**Article:** Sensex Hits Lifetime Highs Amid Global Market Rally (`market-rallies`)
+
+### 💰 Transaction Summary
+| Metric | Value |
+| :--- | :--- |
+| **Broker Price** | $0.50 USD |
+| **Settlement** | 🟢 Payment Verified — Data Delivered |
+| **Data Delivery** | ✅ Delivered |
+| **Network** | N/A |
+| **Pay-To Wallet** | `N/A` |
+
+### ⏱️ Agent Pipeline
+- **Broker Pricing** → Set price at $0.50
+- **Settlement Agent** → verified
+- **Packager Agent** → ✅ Delivered
+- **Audit Agent** → Log recorded
+
+---
+## 📋 Seller Audit Log Entry
+**Timestamp:** 2026-03-27T11:24:21.219Z
+**Article:** Tech Giants Pour Billions into Generative AI Infrastructure (`tech-giant-ai`)
+
+### 💰 Transaction Summary
+| Metric | Value |
+| :--- | :--- |
+| **Broker Price** | $0.50 USD |
+| **Settlement** | 🟢 Payment Verified — Data Delivered |
+| **Data Delivery** | ✅ Delivered |
+| **Network** | N/A |
+| **Pay-To Wallet** | `N/A` |
+
+### ⏱️ Agent Pipeline
+- **Broker Pricing** → Set price at $0.50
+- **Settlement Agent** → verified
+- **Packager Agent** → ✅ Delivered
+- **Audit Agent** → Log recorded
+
+---

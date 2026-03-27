@@ -1,0 +1,2 @@
+data: {"event": "agent_step", "node": "start", "message": "Initializing Journalist Agent..."}
+

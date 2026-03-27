@@ -35,34 +35,42 @@ def investigate():
         # Send initial start event
         yield f"data: {json.dumps({'event': 'agent_step', 'node': 'start', 'message': 'Initializing Journalist Agent...'})}\n\n"
 
-        for output in langgraph_app.stream(initial_state, config, stream_mode="updates"):
-            for node_name, state_update in output.items():
-                
-                # Extract relevant data for the UI
-                messages = state_update.get("messages", [])
-                latest_msg_content = ""
-                
-                if messages and isinstance(messages[-1], AIMessage):
-                    latest_msg_content = messages[-1].content
+        try:
+            for output in langgraph_app.stream(initial_state, config, stream_mode="updates"):
+                for node_name, state_update in output.items():
                     
-                draft_content = state_update.get("draft_content", "")
-                payment_required = state_update.get("payment_required", False)
-                invoice_details = state_update.get("invoice_details", {})
-                
-                # Format an SSE chunk
-                chunk = {
-                    "event": "agent_step",
-                    "node": node_name,
-                    "message": latest_msg_content,
-                    "draft_content": draft_content,
-                    "payment_required": payment_required,
-                    "invoice_details": invoice_details
-                }
-                
-                yield f"data: {json.dumps(chunk)}\n\n"
-                time.sleep(0.5)  # Slight delay for UI pacing
+                    if state_update.get("error"):
+                        yield f"data: {json.dumps({'event': 'error', 'message': state_update['error']})}\n\n"
+                        return
 
-        yield f"data: {json.dumps({'event': 'complete', 'message': 'Investigation completed.'})}\n\n"
+                    # Extract relevant data for the UI
+                    messages = state_update.get("messages", [])
+                    latest_msg_content = ""
+                    
+                    if messages and isinstance(messages[-1], AIMessage):
+                        latest_msg_content = messages[-1].content
+                        
+                    draft_content = state_update.get("draft_content", "")
+                    payment_required = state_update.get("payment_required", False)
+                    invoice_details = state_update.get("invoice_details", {})
+                    
+                    # Format an SSE chunk
+                    chunk = {
+                        "event": "agent_step",
+                        "node": node_name,
+                        "message": latest_msg_content,
+                        "draft_content": draft_content,
+                        "payment_required": payment_required,
+                        "invoice_details": invoice_details
+                    }
+                    
+                    yield f"data: {json.dumps(chunk)}\n\n"
+                    time.sleep(0.5)  # Slight delay for UI pacing
+
+            yield f"data: {json.dumps({'event': 'complete', 'message': 'Investigation completed.'})}\n\n"
+        except Exception as e:
+            # Catch backend crashes and explicitly tell the frontend the reason
+            yield f"data: {json.dumps({'event': 'error', 'message': f'{type(e).__name__}: {str(e)}'})}\n\n"
 
     return Response(generate(), mimetype='text/event-stream')
 

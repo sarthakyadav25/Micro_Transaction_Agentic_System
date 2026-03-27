@@ -52,5 +52,6 @@ class JournalistState(TypedDict):
     access_token: str                              # None at init
     payment_approved: bool                         # default False at init
     payment_attempts: int                          # default 0 at init
+    error: str                                     # default "" at init
     messages: Annotated[list, add_messages]         # reducer: append
 

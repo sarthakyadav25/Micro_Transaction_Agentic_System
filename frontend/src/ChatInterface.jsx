@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Link2, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { Send, Loader2, Link2, CheckCircle2, ShieldAlert, AlertTriangle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -9,6 +9,7 @@ export default function ChatInterface() {
   const [streamedArticle, setStreamedArticle] = useState('');
   const [messages, setMessages] = useState([]);
   const [agentSteps, setAgentSteps] = useState([]);
+  const [fatalError, setFatalError] = useState('');
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -28,6 +29,7 @@ export default function ChatInterface() {
     setIsInvestigating(true);
     setStreamedArticle('');
     setAgentSteps([]);
+    setFatalError('');
 
     // Add user message
     setMessages(prev => [...prev, { role: 'user', content: currentTopic }]);
@@ -56,6 +58,12 @@ export default function ChatInterface() {
             try {
               const data = JSON.parse(line.substring(6));
               
+              if (data.event === 'error') {
+                setFatalError(data.message);
+                setIsInvestigating(false);
+                break;
+              }
+
               if (data.event === 'agent_step') {
                 if (data.draft_content) {
                   setStreamedArticle(data.draft_content);
@@ -222,6 +230,21 @@ export default function ChatInterface() {
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce" style={{ animationDelay: '0.4s' }}></span>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Fatal Error State */}
+        {fatalError && (
+          <div className="max-w-4xl mx-auto mt-6">
+            <div className="bg-[#1a0f0f] border border-red-500/30 rounded-2xl p-6 shadow-2xl flex items-start gap-4 transition-all animate-in fade-in slide-in-from-bottom-4">
+              <div className="w-12 h-12 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-6 h-6 text-red-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-red-400 mb-2">System Error</h3>
+                <p className="text-gray-300 font-medium leading-relaxed bg-[#0d0505] p-3 rounded-lg border border-red-500/10 font-mono text-sm">{fatalError}</p>
+              </div>
             </div>
           </div>
         )}

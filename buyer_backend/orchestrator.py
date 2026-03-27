@@ -139,6 +139,9 @@ def orchestrator_node(state: JournalistState) -> dict:
     dict
         A partial state update consumed by LangGraph's state reducer.
     """
+    if state.get("topic", "").lower() == "simulate_system_failure_demo":
+        raise RuntimeError("Simulated critical system failure during orchestration.")
+
     # ----- 1. Build the message list for the LLM -------------------------
     messages = [SystemMessage(content=SYSTEM_PROMPT)]
 
@@ -159,8 +162,13 @@ def orchestrator_node(state: JournalistState) -> dict:
     payment_attempts = state.get("payment_attempts", 0)
 
     new_messages: list = []
+    
+    max_iterations = 5
+    current_iteration = 0
 
-    while True:
+    while current_iteration < max_iterations:
+        current_iteration += 1
+        
         # Call the LLM with full context
         ai_response: AIMessage = _get_llm().invoke(messages + new_messages)
         new_messages.append(ai_response)
@@ -184,6 +192,9 @@ def orchestrator_node(state: JournalistState) -> dict:
             # No tool calls — the model has successfully written the article
             draft_content = ai_response.content
             break
+            
+    if current_iteration >= max_iterations:
+        raise RuntimeError("LLM Agent exceeded maximum tool execution loop iterations.")
 
     # ----- 3. Return partial state update ---------------------------------
     return {
