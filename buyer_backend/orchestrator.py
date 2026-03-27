@@ -25,7 +25,7 @@ from langchain_core.messages import (
 )
 
 from state import JournalistState
-from tools import fetch_offshore_corporate_registry
+from tools import discover_articles, fetch_article
 
 # ---------------------------------------------------------------------------
 # Load environment variables (expects OPENAI_API_KEY in .env)
@@ -38,17 +38,22 @@ load_dotenv()
 SYSTEM_PROMPT = (
     "You are an elite AI Investigative Journalist for the Economic Times. "
     "Your goal is to write a briefing on the provided topic. "
-    "You MUST use the `fetch_offshore_corporate_registry` tool to get "
-    "exclusive data. If the tool returns a 402 Payment Required error, "
-    "DO NOT attempt to make up data and DO NOT fail. Acknowledge the "
-    "paywall in your internal thought process and stop execution so the "
-    "finance team can pay."
+    "Follow this workflow strictly:\n"
+    "1. FIRST use the `discover_articles` tool with your topic to find "
+    "relevant articles from the seller's catalog.\n"
+    "2. Review the catalog returned (titles, summaries, prices).\n"
+    "3. Decide which articles are worth purchasing for your investigation.\n"
+    "4. Use the `fetch_article` tool with the article_id to access each "
+    "selected article. If it returns a 402 Payment Required error, "
+    "DO NOT attempt to make up data. Acknowledge the paywall and stop "
+    "so the finance team can pay.\n"
+    "5. After payment succeeds and data is retrieved, compile your briefing."
 )
 
 # ---------------------------------------------------------------------------
 # Available tools (list used for binding & execution lookup)
 # ---------------------------------------------------------------------------
-TOOLS = [fetch_offshore_corporate_registry]
+TOOLS = [discover_articles, fetch_article]
 _TOOL_MAP = {t.name: t for t in TOOLS}
 
 # ---------------------------------------------------------------------------

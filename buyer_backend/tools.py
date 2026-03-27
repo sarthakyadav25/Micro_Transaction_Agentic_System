@@ -1,14 +1,16 @@
 """
 tools.py — Premium Data Tools for the AI Investigative Journalist.
 
-Contains `fetch_offshore_corporate_registry`, a LangChain tool that simulates
-calling a paywalled corporate-data API.
+Contains:
+- `discover_articles` — Calls the seller's free discovery endpoint to get a
+  catalog of articles relevant to a query.
+- `fetch_article` — Calls a paywalled article endpoint on the seller.
 
 **402 Protocol (x402 / Ethereum)**
 When the caller does not supply a valid `access_token`, the tool returns a
-structured 402 error (JSON) containing an Ethereum invoice with `amount_eth`
-and `recipient_wallet`.  After the Execution Agent sends the on-chain payment,
-the resulting transaction hash is used as the `access_token` (proof-of-payment).
+structured 402 error (JSON) containing an x402 USDC invoice. After the
+Execution Agent sends the on-chain payment, the resulting transaction hash
+is used as the `access_token` (proof-of-payment).
 """
 
 import json
@@ -17,21 +19,48 @@ import requests
 from langchain_core.tools import tool
 
 
+SELLER_BASE_URL = "http://localhost:5001"
+
+
 @tool
-def fetch_offshore_corporate_registry(
-    query: str,
-    access_token: str = "",
-) -> str:
-    """Fetch data from a premium offshore corporate registry.
+def discover_articles(query: str) -> str:
+    """Discover available articles from the seller's catalog.
 
     Parameters
     ----------
     query : str
-        A natural-language search query (e.g. a company name or jurisdiction).
+        A natural-language topic query (e.g. "AI investments").
+
+    Returns
+    -------
+    str
+        A JSON string with the catalog of relevant articles,
+        each including id, title, summary, price, and isFree.
+    """
+    try:
+        response = requests.post(
+            f"{SELLER_BASE_URL}/api/discover",
+            json={"query": query},
+            headers={"Content-Type": "application/json"},
+        )
+        return json.dumps(response.json())
+    except requests.RequestException as e:
+        return json.dumps({"status": 500, "error": f"Discovery failed: {e}"})
+
+
+@tool
+def fetch_article(
+    article_id: str,
+    access_token: str = "",
+) -> str:
+    """Fetch a premium article from the seller by its article ID.
+
+    Parameters
+    ----------
+    article_id : str
+        The article ID from the discovery catalog (e.g. "tech-giant-ai").
     access_token : str, optional
-        Proof-of-payment token.  In the x402 Ethereum flow this is the
-        transaction hash (starts with ``0x``).  If missing or invalid the
-        endpoint returns HTTP 402 with an Ethereum invoice.
+        Proof-of-payment token (x402 transaction hash starting with ``0x``).
 
     Returns
     -------
@@ -39,7 +68,7 @@ def fetch_offshore_corporate_registry(
         A JSON string.  Either the premium payload on success or a 402
         error envelope containing the invoice / payment instructions.
     """
-    url = "http://localhost:5001/api/data/tech-giant-ai.json"
+    url = f"{SELLER_BASE_URL}/api/data/{article_id}.json"
     headers = {}
     
     if access_token:
